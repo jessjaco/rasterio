@@ -319,6 +319,20 @@ def test_azure_session_class_connection_string():
         == 'AccountName=myaccount;AccountKey=MY_ACCOUNT_KEY'
     )
 
+def test_azure_session_workload_identity():
+    azure_session = AzureSession(azure_tenant_id="tenant", azure_client_id="client",
+                                 azure_federated_token_file="/file/path", 
+                                 azure_authority_host="authme.com")
+    assert azure_session._creds
+    cred_options = azure_session.get_credential_options()
+    assert "AZURE_TENANT_ID" in cred_options
+    assert cred_options["AZURE_TENANT_ID"] == "tenant"
+    assert "AZURE_CLIENT_ID" in cred_options
+    assert cred_options["AZURE_CLIENT_ID"] == "client"
+    assert "AZURE_FEDERATED_TOKEN_FILE" in cred_options
+    assert cred_options["AZURE_FEDERATED_TOKEN_FILE"] == "/file/path"
+    assert "AZURE_AUTHORITY_HOST" in cred_options
+    assert cred_options["AZURE_AUTHORITY_HOST"] == "authme.com"
 
 def test_session_factory_az_kwargs():
     """Get an AzureSession for az:// paths with keywords"""
